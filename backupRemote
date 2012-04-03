@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# temporary backup folder
+BACKUP_DIR=tmp/myBackupDir
+
+# folders that contain files web server serves (space separated)
+SITES=( public_html )
+
+# MySQL databases we want to backup
+DATABASES=( myDb1 myDb2 )
+
+# MySQL usernames (same order as DATABASES)
+DB_USERS=( myDb1User myDb2User )
+
+# MySQL passwords (same order as DATABASES)
+DB_PASSWORDS=( myDb1Pass myDb2Pass )
+
+
+if [ -d "$BACKUP_DIR" ]; then
+	echo "[BACKUP] Removing previously used backup directory..."
+	rm -rf $BACKUP_DIR
+fi
+
+echo "[BACKUP] Creating backup directory..."
+mkdir $BACKUP_DIR
+
+for i in `seq 0	$((${#SITES[@]}-1))`
+do
+	echo "[BACKUP] Copying ${SITES[$i]} to backup directory..."
+	cp -r ${SITES[$i]} $BACKUP_DIR/${SITES[$i]}
+done
+
+for i in `seq 0 $((${#DATABASES[@]}-1))`
+do
+	echo "[BACKUP] Dumping ${DATABASES[$i]} to backup directory..."
+	mysqldump -u ${DB_USERS[$i]} -p${DB_PASSWORDS[$i]} ${DATABASES[$i]} > $BACKUP_DIR/${DATABASES[$i]}.sql
+done
+
+echo "[BACKUP] Compressing backup directory..."
+tar czf backup.tgz $BACKUP_DIR
+echo "[BACKUP] File backup.tgz created!"
+
+
+echo "[BACKUP] Cleaning up..."
+rm -rf $BACKUP_DIR
+echo "[BACKUP] Done!"

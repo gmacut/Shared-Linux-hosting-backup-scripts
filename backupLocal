@@ -1,0 +1,64 @@
+#!/usr/bin/expect -f
+
+# raise if your server backup script takes more than 360 seconds to complete
+set timeout 360
+
+# path to your ssh private key (absolute!)
+set SSH_KEY /home/user/.ssh/id_rsa
+
+# ssh host
+set HOST user@host
+
+# end of prompt that asks you for your passprase
+set EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT ".ssh/user':"
+
+# your ssh private key passprase
+set PASSPRASE "myPassprase"
+
+# remote servers expected prompt
+set EXPECT_PROMPT "\# "
+
+# remote servers backup script
+set REMOTE_SCRIPT "./backupRemote"
+
+# remote servers file with backup (valid after running the servers backup script)
+set REMOTE_BACKUP_FILE "backup.tgz"
+
+# local backup directory (this one changes every day - for daily backup using cron to run this script)
+set LOCAL_BACKUP_DIR "/backup/\[BACKUP\][exec date +%Y-%m-%d]"
+
+
+
+
+#		SSH CONNECTION OPEN	#
+spawn ssh -i $SSH_KEY $HOST
+
+expect $EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT
+
+send $PASSPRASE
+send "\r"
+
+
+
+#		REMOTE COMMANDS		#
+expect $EXPECT_PROMPT
+send "$REMOTE_SCRIPT\r"
+
+expect $EXPECT_PROMPT
+send "exit\r"		
+#closes ssh connection
+expect eof
+
+
+
+#		LOCAL COMMANDS		#
+spawn mkdir -p $LOCAL_BACKUP_DIR
+expect eof
+
+spawn scp -i $SSH_KEY $HOST:$REMOTE_BACKUP_FILE $LOCAL_BACKUP_DIR
+
+expect $EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT
+
+send $PASSPRASE
+send "\r"
+expect eof
