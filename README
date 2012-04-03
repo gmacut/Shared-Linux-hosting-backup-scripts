@@ -1,0 +1,4 @@
+This project consists of two bash scripts: backupRemote and backupLocal. They are meant to be used for automated backup of sites on shared Linux hosting where user typically has limited privileges.
+
+Script backupRemote packs and compresses files and MySQL databases on remote server. It can be run manually, or using second script from our local machine.
+Script backupLocal is able to connect to remote server using ssh with public-private key authentication and passprases. On established connection script executes backupRemote. Resulting backup package is then transferred to our local machine and stored to a safe place of our choosing.
