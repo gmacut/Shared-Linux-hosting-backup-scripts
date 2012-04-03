@@ -1,5 +1,18 @@
 #!/bin/bash
 
+
+# Backup script ment to be run on remote shared hosting linux environment,
+# with limited privileges. It copies and compresses site directories and
+# MySQL databases. You have to be able to run mysqldump on your sistem in 
+# order to use this script.
+# 
+# Result archive backup.tgz can then be transferred to another machine.
+#
+# USAGE: you have to specify site directories you want to copy in $SITES
+# variable. Database details go to DATABASES, DB_USERS and DB_PASSWORDS
+# arrays.
+
+
 # temporary backup folder
 BACKUP_DIR=tmp/myBackupDir
 

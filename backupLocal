@@ -1,5 +1,19 @@
 #!/usr/bin/expect -f
 
+
+# This is a local expect script that connects to remote server specified in $HOST,
+# using supplied credentials (ssh private key and passphrase). It executes remote 
+# servers $REMOTE_SCRIPT and than transfers result (in $REMOTE_BACKUP_FILE) to local
+# $LOCAL_BACKUP_DIR directory.
+
+# EXAMPLE Script can be started using cron with:
+# sudo crontab -e
+# and then adding: 
+# 0 3 * * * /path/to/backupLocal
+# for daily backup at 3:00AM 
+
+
+
 # raise if your server backup script takes more than 360 seconds to complete
 set timeout 360
 
@@ -9,11 +23,11 @@ set SSH_KEY /home/user/.ssh/id_rsa
 # ssh host
 set HOST user@host
 
-# end of prompt that asks you for your passprase
-set EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT ".ssh/user':"
+# end of prompt that asks you for your passphrase
+set EXPECT_PRIVATE_KEY_PASSPHRASE_PROMPT ".ssh/user':"
 
-# your ssh private key passprase
-set PASSPRASE "myPassprase"
+# your ssh private key passpihrase
+set PASSPHRASE "myPassphrase"
 
 # remote servers expected prompt
 set EXPECT_PROMPT "\# "
@@ -33,9 +47,9 @@ set LOCAL_BACKUP_DIR "/backup/\[BACKUP\][exec date +%Y-%m-%d]"
 #		SSH CONNECTION OPEN	#
 spawn ssh -i $SSH_KEY $HOST
 
-expect $EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT
+expect $EXPECT_PRIVATE_KEY_PASSPHRASE_PROMPT
 
-send $PASSPRASE
+send $PASSPHRASE
 send "\r"
 
 
@@ -57,8 +71,8 @@ expect eof
 
 spawn scp -i $SSH_KEY $HOST:$REMOTE_BACKUP_FILE $LOCAL_BACKUP_DIR
 
-expect $EXPECT_PRIVATE_KEY_PASSPRASE_PROMPT
+expect $EXPECT_PRIVATE_KEY_PASSPHRASE_PROMPT
 
-send $PASSPRASE
+send $PASSPHRASE
 send "\r"
 expect eof
